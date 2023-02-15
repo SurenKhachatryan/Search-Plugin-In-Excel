@@ -45,22 +45,11 @@ namespace ExcelFindMatchRows
 
                     var application = Globals.ThisAddIn.GetApplication();
 
-                    foreach (Excel.Worksheet workSheet in application.Worksheets)
+                    if (!TryDeleteWorkSheet(application, searchResultTab))
                     {
-                        if (workSheet.Name == searchResultTab)
-                        {
-                            try
-                            {
-                                workSheet.Delete();
-                            }
-                            catch
-                            {
-                                MessageBox.Show("Please Press Esc Then Press Search");
-                                Restart();
-                                return;
-                            }
-                            break;
-                        }
+                        MessageBox.Show("Please Press Esc Then Press Search");
+                        Restart();
+                        return;
                     }
 
                     var results = new List<ResultModel>();
@@ -107,6 +96,27 @@ namespace ExcelFindMatchRows
             }
 
             Restart();
+        }
+
+        private static bool TryDeleteWorkSheet(Excel.Application application, string searchResultTab)
+        {
+            foreach (Excel.Worksheet workSheet in application.Worksheets)
+            {
+                if (workSheet.Name == searchResultTab)
+                {
+                    try
+                    {
+                        workSheet.Delete();
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                    break;
+                }
+            }
+
+            return true;
         }
 
         private void InsertResultData(string searchResultTab, List<ResultModel> results, Worksheet resultWorkSheet)
