@@ -17,6 +17,7 @@ namespace ExcelFindMatchRows
     {
         public CancellationTokenSource CancelTokenSource;
         public CancellationToken CancelToken;
+        private int FoundCount;
 
         private void Ribbon1_Load(object sender, RibbonUIEventArgs e)
         {
@@ -190,6 +191,8 @@ namespace ExcelFindMatchRows
             {
                 var fisrtCells = (Excel.Range)sheet.Cells[currentFind.Row, 1];
                 var lastCells = (Excel.Range)sheet.Cells[currentFind.Row, sheet.UsedRange.Columns.Count];
+
+                ProgressLabel.Label = $"Rows {++FoundCount}";
 
                 response.Add(sheet.get_Range(fisrtCells.Address, lastCells.Address));
 
