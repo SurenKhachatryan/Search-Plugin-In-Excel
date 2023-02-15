@@ -43,6 +43,8 @@ namespace ExcelFindMatchRows
                         return;
                     }
 
+                    IsCancellationRequested(CancelToken);
+
                     var application = Globals.ThisAddIn.GetApplication();
 
                     if (!TryDeleteWorkSheet(application, searchResultTab))
@@ -59,6 +61,8 @@ namespace ExcelFindMatchRows
                         if (sheet.Name == searchResultTab)
                             continue;
 
+                        IsCancellationRequested(CancelToken);
+
                         results.Add(new ResultModel()
                         {
                             TableName = sheet.Name,
@@ -66,12 +70,16 @@ namespace ExcelFindMatchRows
                         });
                     }
 
+                    IsCancellationRequested(CancelToken);
+
                     if (results.SelectMany(x => x.Rows).Count() == 0)
                     {
                         MessageBox.Show("Nothing found for your request");
                         Restart();
                         return;
                     }
+
+                    IsCancellationRequested(CancelToken);
 
                     if (!TryCreateWorkSheet(application, searchResultTab, out var resultWorkSheet))
                     {
@@ -129,17 +137,11 @@ namespace ExcelFindMatchRows
                                           .OrderBy(x => x.TableName)
                                           .ToList())
             {
-                if (CancelToken.IsCancellationRequested)
-                {
-                    CancelToken.ThrowIfCancellationRequested();
-                }
+                IsCancellationRequested(CancelToken);
 
                 for (int i = startWithRow; i <= result.Rows.Count + startWithRow - 1; i++)
                 {
-                    if (CancelToken.IsCancellationRequested)
-                    {
-                        CancelToken.ThrowIfCancellationRequested();
-                    }
+                    IsCancellationRequested(CancelToken);
 
                     var row = result.Rows[i - startWithRow];
 
@@ -191,8 +193,7 @@ namespace ExcelFindMatchRows
 
                 response.Add(sheet.get_Range(fisrtCells.Address, lastCells.Address));
 
-                if (CancelToken.IsCancellationRequested)
-                    CancelToken.ThrowIfCancellationRequested();
+                IsCancellationRequested(CancelToken);
 
                 if (firstFind == null)
                 {
@@ -214,6 +215,14 @@ namespace ExcelFindMatchRows
             buttonSearch.Visible = true;
             buttonCencel.Visible = false;
             ProgressLabel.Visible = false;
+        }
+
+        private void IsCancellationRequested(CancellationToken CancelToken)
+        {
+            if (CancelToken.IsCancellationRequested)
+            {
+                CancelToken.ThrowIfCancellationRequested();
+            }
         }
     }
 }
