@@ -4,11 +4,9 @@ using Microsoft.Office.Tools.Ribbon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelFindMatchRows
@@ -27,6 +25,8 @@ namespace ExcelFindMatchRows
 
         private async void Search_Button_Click(object sender, RibbonControlEventArgs e)
         {
+            FoundCount = 0;
+
             await Task.Run(async () =>
             {
                 try
