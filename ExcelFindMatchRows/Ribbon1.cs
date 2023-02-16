@@ -140,7 +140,7 @@ namespace ExcelFindMatchRows
             {
                 IsCancellationRequested(CancelToken);
 
-                for (int i = startWithRow; i <= result.Rows.Count + startWithRow - 1; i++)
+                for (int i = startWithRow; i < result.Rows.Count + startWithRow; i++)
                 {
                     IsCancellationRequested(CancelToken);
 
@@ -192,10 +192,6 @@ namespace ExcelFindMatchRows
                 var fisrtCells = (Excel.Range)sheet.Cells[currentFind.Row, 1];
                 var lastCells = (Excel.Range)sheet.Cells[currentFind.Row, sheet.UsedRange.Columns.Count];
 
-                ProgressLabel.Label = $"Rows {++FoundCount}";
-
-                response.Add(sheet.get_Range(fisrtCells.Address, lastCells.Address));
-
                 IsCancellationRequested(CancelToken);
 
                 if (firstFind == null)
@@ -206,6 +202,10 @@ namespace ExcelFindMatchRows
                 {
                     break;
                 }
+
+                ProgressLabel.Label = $"Rows {++FoundCount}";
+
+                response.Add(sheet.get_Range(fisrtCells.Address, lastCells.Address));
 
                 currentFind = range.FindNext(lastCells);
             }
