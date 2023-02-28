@@ -4,11 +4,9 @@ using Microsoft.Office.Tools.Ribbon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelFindMatchRows
@@ -17,6 +15,7 @@ namespace ExcelFindMatchRows
     {
         public CancellationTokenSource CancelTokenSource;
         public CancellationToken CancelToken;
+        private int FoundCount;
 
         private void Ribbon1_Load(object sender, RibbonUIEventArgs e)
         {
@@ -26,6 +25,8 @@ namespace ExcelFindMatchRows
 
         private async void Search_Button_Click(object sender, RibbonControlEventArgs e)
         {
+            FoundCount = 0;
+
             await Task.Run(async () =>
             {
                 try
@@ -139,7 +140,7 @@ namespace ExcelFindMatchRows
             {
                 IsCancellationRequested(CancelToken);
 
-                for (int i = startWithRow; i <= result.Rows.Count + startWithRow - 1; i++)
+                for (int i = startWithRow; i < result.Rows.Count + startWithRow; i++)
                 {
                     IsCancellationRequested(CancelToken);
 
@@ -191,8 +192,6 @@ namespace ExcelFindMatchRows
                 var fisrtCells = (Excel.Range)sheet.Cells[currentFind.Row, 1];
                 var lastCells = (Excel.Range)sheet.Cells[currentFind.Row, sheet.UsedRange.Columns.Count];
 
-                response.Add(sheet.get_Range(fisrtCells.Address, lastCells.Address));
-
                 IsCancellationRequested(CancelToken);
 
                 if (firstFind == null)
@@ -203,6 +202,10 @@ namespace ExcelFindMatchRows
                 {
                     break;
                 }
+
+                ProgressLabel.Label = $"Rows {++FoundCount}";
+
+                response.Add(sheet.get_Range(fisrtCells.Address, lastCells.Address));
 
                 currentFind = range.FindNext(lastCells);
             }
